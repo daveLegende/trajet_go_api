@@ -1,0 +1,2 @@
+# Clean Architecture layer placeholders — modules will follow this structure:
+# src/modules/<module>/{domain,application,infrastructure,presentation}

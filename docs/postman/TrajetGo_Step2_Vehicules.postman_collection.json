@@ -1,0 +1,219 @@
+{
+  "info": {
+    "_postman_id": "trajetgo-step2-vehicules-v1",
+    "name": "TrajetGo API - Step 2 - Véhicules",
+    "description": "Collection Postman dédiée à l'étape 2 du backend TrajetGo : gestion des véhicules (CRUD + validation admin).\n\nPré-requis :\n- un utilisateur connecté avec rôle CONDUCTEUR / LES_DEUX / ADMIN\n- variable d'environnement `accessToken` remplie\n- variable `vehiculeId` enregistrée automatiquement après création",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "vehiculeId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "02 - Véhicules",
+      "item": [
+        {
+          "name": "Créer un véhicule",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const json = pm.response.json();",
+                  "  pm.collectionVariables.set('vehiculeId', json.id);",
+                  "  pm.test('Véhicule créé', () => pm.response.to.have.status(201));",
+                  "  pm.test('ID enregistré', () => pm.expect(json.id).to.be.a('string'));",
+                  "}",
+                  "else {",
+                  "  console.log('Réponse non 201 : ', pm.response.code);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"marque\": \"Toyota\",\n  \"modele\": \"Corolla\",\n  \"couleur\": \"Blanc\",\n  \"immatriculation\": \"TG-1234-AZ\",\n  \"nombre_places\": 5,\n  \"annee\": 2021,\n  \"photos\": [\n    \"https://cdn.example.com/vehicules/toyota-corolla-1.jpg\"\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/vehicules",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "vehicules"
+              ]
+            },
+            "description": "Crée un véhicule pour le conducteur connecté. Rôle requis : CONDUCTEUR, LES_DEUX ou ADMIN."
+          },
+          "response": []
+        },
+        {
+          "name": "Lister mes véhicules",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/vehicules/my",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "vehicules",
+                "my"
+              ]
+            },
+            "description": "Retourne la liste des véhicules du conducteur connecté."
+          },
+          "response": []
+        },
+        {
+          "name": "Détail d'un véhicule",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/vehicules/{{vehiculeId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "vehicules",
+                "{{vehiculeId}}"
+              ]
+            },
+            "description": "Retourne les détails d'un véhicule. Accessible au propriétaire ou à un admin."
+          },
+          "response": []
+        },
+        {
+          "name": "Modifier un véhicule",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"couleur\": \"Rouge\",\n  \"nombre_places\": 4\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/vehicules/{{vehiculeId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "vehicules",
+                "{{vehiculeId}}"
+              ]
+            },
+            "description": "Modifie les informations d'un véhicule. Seul le propriétaire peut faire la modification."
+          },
+          "response": []
+        },
+        {
+          "name": "Valider / Rejeter un véhicule (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"statut\": \"VERIFIE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/vehicules/{{vehiculeId}}/verify",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "vehicules",
+                "{{vehiculeId}}",
+                "verify"
+              ]
+            },
+            "description": "Valide ou rejette un véhicule. Réservé aux ADMIN. Si statut = REJETE, le champ motif est obligatoire."
+          },
+          "response": []
+        },
+        {
+          "name": "Supprimer un véhicule",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/vehicules/{{vehiculeId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "vehicules",
+                "{{vehiculeId}}"
+              ]
+            },
+            "description": "Supprime un véhicule. Accessible au propriétaire ou à un admin. Retourne 204 No Content."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

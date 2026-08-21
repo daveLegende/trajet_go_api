@@ -1,0 +1,1143 @@
+{
+  "info": {
+    "_postman_id": "trajetgo-api-collection-v1",
+    "name": "TrajetGo API",
+    "description": "Collection Postman pour l'API backend de covoiturage TrajetGo (Togo).\nInclut l'automatisation des tokens JWT (mise en variable automatique de l'accessToken et du refreshToken).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refreshToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "vehiculeId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "trajetId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "reservationId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "transactionId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "00 - Health",
+      "item": [
+        {
+          "name": "Health Check (API & Database)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
+            },
+            "description": "Vérifie l'état de l'API et la connectivité à PostgreSQL."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "01 - Auth & Users",
+      "item": [
+        {
+          "name": "1. Envoyer OTP (4 chiffres)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cible\": \"+22890123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/otp/send",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "otp",
+                "send"
+              ]
+            },
+            "description": "Génère un code OTP à 4 chiffres valable 10 minutes."
+          },
+          "response": []
+        },
+        {
+          "name": "2. Vérifier OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cible\": \"+22890123456\",\n  \"code\": \"1234\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/otp/verify",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "otp",
+                "verify"
+              ]
+            },
+            "description": "Valide le code OTP à 4 chiffres reçu par l'utilisateur."
+          },
+          "response": []
+        },
+        {
+          "name": "3. Inscription (Passager)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var json = pm.response.json();",
+                  "    pm.collectionVariables.set('accessToken', json.access_token);",
+                  "    pm.collectionVariables.set('refreshToken', json.refresh_token);",
+                  "    console.log('Tokens sauvegardés automatiquement dans les variables de collection !');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Koffi\",\n  \"prenom\": \"Abalo\",\n  \"email\": \"koffi.abalo@example.com\",\n  \"telephone\": \"+22890123456\",\n  \"mot_de_passe\": \"MotDePasseFort123!\",\n  \"type_utilisateur\": \"PASSAGER\",\n  \"date_naissance\": \"1998-05-20\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            },
+            "description": "Inscrit un nouvel utilisateur (rôle Passager). Les tokens JWT sont automatiquement capturés dans les variables Postman."
+          },
+          "response": []
+        },
+        {
+          "name": "4. Inscription (Conducteur)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var json = pm.response.json();",
+                  "    pm.collectionVariables.set('accessToken', json.access_token);",
+                  "    pm.collectionVariables.set('refreshToken', json.refresh_token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Mensah\",\n  \"prenom\": \"Kodjo\",\n  \"email\": \"kodjo.mensah@example.com\",\n  \"telephone\": \"+22891987654\",\n  \"mot_de_passe\": \"ConducteurFort123!\",\n  \"type_utilisateur\": \"CONDUCTEUR\",\n  \"date_naissance\": \"1992-11-10\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            },
+            "description": "Inscrit un nouvel utilisateur (rôle Conducteur)."
+          },
+          "response": []
+        },
+        {
+          "name": "5. Connexion (Login)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var json = pm.response.json();",
+                  "    pm.collectionVariables.set('accessToken', json.access_token);",
+                  "    pm.collectionVariables.set('refreshToken', json.refresh_token);",
+                  "    console.log('Connexion réussie : tokens mis à jour !');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identifier\": \"+22890123456\",\n  \"mot_de_passe\": \"MotDePasseFort123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Connexion par email ou téléphone (+228XXXXXXXX). Met à jour accessToken et refreshToken."
+          },
+          "response": []
+        },
+        {
+          "name": "6. Obtenir mon profil (GET /users/me)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "me"
+              ]
+            },
+            "description": "Récupère les informations du profil de l'utilisateur connecté via son Bearer access token."
+          },
+          "response": []
+        },
+        {
+          "name": "7. Rafraîchir les tokens (Rotation)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var json = pm.response.json();",
+                  "    pm.collectionVariables.set('accessToken', json.access_token);",
+                  "    pm.collectionVariables.set('refreshToken', json.refresh_token);",
+                  "    console.log('Rotation effectuée : nouveaux tokens enregistrés !');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh_token\": \"{{refreshToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/refresh",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "refresh"
+              ]
+            },
+            "description": "Utilise le refresh token pour régénérer un nouvel access token et un nouveau refresh token."
+          },
+          "response": []
+        },
+        {
+          "name": "8. Déconnexion (Logout)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh_token\": \"{{refreshToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
+            },
+            "description": "Révoque le refresh token et déconnecte l'utilisateur."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "02 - Vehicules",
+      "description": "Gestion des véhicules : CRUD + validation admin",
+      "item": [
+        {
+          "name": "Ajouter un véhicule",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"marque\": \"Toyota\",\n  \"modele\": \"Corolla\",\n  \"couleur\": \"Blanc\",\n  \"immatriculation\": \"TG-1234-AZ\",\n  \"nombre_places\": 4,\n  \"annee\": 2019\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/vehicules",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "vehicules"
+              ]
+            },
+            "description": "Crée un véhicule pour le conducteur connecté. Rôle requis: CONDUCTEUR, LES_DEUX ou ADMIN."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const json = pm.response.json();",
+                  "  pm.collectionVariables.set('vehiculeId', json.id);",
+                  "  pm.test('Vehicule créé avec succès', () => pm.response.to.have.status(201));",
+                  "  pm.test('vehiculeId enregistré : ' + json.id, () => pm.expect(json.id).to.be.a('string'));",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Mes véhicules",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/vehicules/my",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "vehicules",
+                "my"
+              ]
+            },
+            "description": "Retourne la liste des véhicules du conducteur connecté."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Liste récupérée avec succès', () => pm.response.to.have.status(200));",
+                  "pm.test('Réponse est un tableau', () => pm.expect(pm.response.json()).to.be.an('array'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Détail d'un véhicule",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/vehicules/{{vehiculeId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "vehicules",
+                "{{vehiculeId}}"
+              ]
+            },
+            "description": "Retourne le détail d'un véhicule. Accessible au propriétaire ou à un admin."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Détail récupéré', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Modifier un véhicule",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"couleur\": \"Rouge\",\n  \"nombre_places\": 3\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/vehicules/{{vehiculeId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "vehicules",
+                "{{vehiculeId}}"
+              ]
+            },
+            "description": "Modifie les informations d'un véhicule. Seul le propriétaire peut modifier. Si documents/photos modifiés, repassera en EN_ATTENTE."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Véhicule modifié', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Valider/Rejeter un véhicule (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"statut\": \"VERIFIE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/vehicules/{{vehiculeId}}/verify",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "vehicules",
+                "{{vehiculeId}}",
+                "verify"
+              ]
+            },
+            "description": "Valide (VERIFIE) ou rejette (REJETE + motif obligatoire) un véhicule. Réservé aux ADMIN."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Statut mis à jour', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Supprimer un véhicule",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/vehicules/{{vehiculeId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "vehicules",
+                "{{vehiculeId}}"
+              ]
+            },
+            "description": "Supprime un véhicule. Accessible au propriétaire ou à un admin. Retourne 204 No Content."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Véhicule supprimé', () => pm.response.to.have.status(204));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "03 - Trajets",
+      "description": "Gestion des trajets (création, recherche, annulation, détails)",
+      "item": [
+        {
+          "name": "Créer un trajet",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ville_depart\": \"Lomé\",\n  \"ville_arrivee\": \"Kara\",\n  \"latitude_depart\": 6.1375,\n  \"longitude_depart\": 1.2125,\n  \"latitude_arrivee\": 9.5494,\n  \"longitude_arrivee\": 1.1895,\n  \"date_depart\": \"2024-12-01\",\n  \"heure_depart\": \"08:00\",\n  \"places_disponibles\": 3,\n  \"prix_par_place\": 5000,\n  \"type_reservation\": \"INSTANT\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/trajets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "trajets"
+              ]
+            },
+            "description": "Crée un trajet (nécessite d'être un conducteur avec un véhicule vérifié)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const json = pm.response.json();",
+                  "  pm.collectionVariables.set('trajetId', json.id);",
+                  "  pm.test('Trajet créé', () => pm.response.to.have.status(201));",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Rechercher des trajets",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/trajets?ville_depart=Lomé&ville_arrivee=Kara&places_disponibles=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "trajets"
+              ],
+              "query": [
+                {
+                  "key": "ville_depart",
+                  "value": "Lomé"
+                },
+                {
+                  "key": "ville_arrivee",
+                  "value": "Kara"
+                },
+                {
+                  "key": "places_disponibles",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Recherche des trajets avec des filtres optionnels."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Recherche réussie', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Détail d'un trajet",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/trajets/{{trajetId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "trajets",
+                "{{trajetId}}"
+              ]
+            },
+            "description": "Obtient les détails d'un trajet."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Détail récupéré', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Annuler un trajet",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/trajets/{{trajetId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "trajets",
+                "{{trajetId}}"
+              ]
+            },
+            "description": "Annule un trajet (conducteur propriétaire ou admin)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Trajet annulé', () => pm.response.to.have.status(204));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "04 - Reservations",
+      "description": "Gestion des réservations de trajets",
+      "item": [
+        {
+          "name": "Créer une réservation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"trajet_id\": \"{{trajetId}}\",\n  \"nombre_places_reservees\": 1,\n  \"point_montee\": \"Gare de Lomé\",\n  \"point_descente\": \"Gare de Kara\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/reservations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reservations"
+              ]
+            },
+            "description": "Créer une réservation pour un trajet."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const json = pm.response.json();",
+                  "  pm.collectionVariables.set('reservationId', json.id);",
+                  "  pm.test('Réservation créée', () => pm.response.to.have.status(201));",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Mes réservations",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/reservations/my",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reservations",
+                "my"
+              ]
+            },
+            "description": "Obtenir l'historique de mes réservations (en tant que passager)."
+          }
+        },
+        {
+          "name": "Accepter une réservation (Conducteur)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/reservations/{{reservationId}}/accept",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reservations",
+                "{{reservationId}}",
+                "accept"
+              ]
+            },
+            "description": "Accepter une réservation en attente (réservé au conducteur du trajet)."
+          }
+        },
+        {
+          "name": "Refuser une réservation (Conducteur)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/reservations/{{reservationId}}/reject",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reservations",
+                "{{reservationId}}",
+                "reject"
+              ]
+            },
+            "description": "Refuser une réservation en attente (réservé au conducteur)."
+          }
+        },
+        {
+          "name": "Annuler ma réservation (Passager)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/reservations/{{reservationId}}/cancel",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reservations",
+                "{{reservationId}}",
+                "cancel"
+              ]
+            },
+            "description": "Annuler une réservation par le passager."
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 - Paiements",
+      "description": "Gestion du portefeuille et des transactions — Étape 5",
+      "item": [
+        {
+          "name": "Consulter mon portefeuille",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json && json.id) {",
+                  "  pm.collectionVariables.set('portefeuilleId', json.id);",
+                  "  console.log('portefeuilleId:', json.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/paiements/portefeuille",
+              "host": ["{{baseUrl}}"],
+              "path": ["paiements", "portefeuille"]
+            },
+            "description": "Retourne le portefeuille de l'utilisateur connecté. Le crée si inexistant."
+          }
+        },
+        {
+          "name": "Recharger le portefeuille",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json && json.id) {",
+                  "  pm.collectionVariables.set('transactionId', json.id);",
+                  "  console.log('transactionId:', json.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.collectionVariables.set('idempCreditKey', pm.variables.replaceIn('{{$guid}}'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"montant\": 5000,\n  \"cle_idempotence\": \"{{idempCreditKey}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/paiements/credit",
+              "host": ["{{baseUrl}}"],
+              "path": ["paiements", "credit"]
+            },
+            "description": "Crédite le portefeuille via Mobile Money (simulé). Idempotent : rejouer la même clé ne double pas le crédit."
+          }
+        },
+        {
+          "name": "Payer une réservation",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.collectionVariables.set('idempPayKey', pm.variables.replaceIn('{{$guid}}'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reservation_id\": \"{{reservationId}}\",\n  \"cle_idempotence\": \"{{idempPayKey}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/paiements/payer",
+              "host": ["{{baseUrl}}"],
+              "path": ["paiements", "payer"]
+            },
+            "description": "Débite le portefeuille du passager pour payer la réservation. Vérifications : ownership, solde suffisant, idempotence."
+          }
+        },
+        {
+          "name": "Historique des transactions",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/paiements/transactions?page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["paiements", "transactions"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" }
+              ]
+            },
+            "description": "Historique paginé des transactions du portefeuille de l'utilisateur connecté."
+          }
+        },
+        {
+          "name": "Détail d'une transaction",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/paiements/transactions/{{transactionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["paiements", "transactions", "{{transactionId}}"]
+            },
+            "description": "Retourne le détail d'une transaction spécifique. Vérifie que la transaction appartient au portefeuille de l'utilisateur."
+          }
+        },
+        {
+          "name": "[ADMIN] Rembourser une transaction",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"transaction_id\": \"{{transactionId}}\",\n  \"motif\": \"Annulation du trajet par le conducteur\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/paiements/admin/remboursement",
+              "host": ["{{baseUrl}}"],
+              "path": ["paiements", "admin", "remboursement"]
+            },
+            "description": "[ADMIN] Crédite le portefeuille du passager et marque la transaction originale comme REMBOURSEE. Token admin requis."
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 - Avis & Notation",
+      "description": "Gestion des avis après un trajet — Étape 6",
+      "item": [
+        {
+          "name": "Laisser un avis",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cible_id\": \"USER_ID_DE_LA_CIBLE\",\n  \"trajet_id\": \"{{trajetId}}\",\n  \"note\": 5,\n  \"commentaire\": \"Excellent voyage !\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/avis",
+              "host": ["{{baseUrl}}"],
+              "path": ["avis"]
+            },
+            "description": "Laisse un avis sur un utilisateur (conducteur ou passager) après un trajet. Recalcule automatiquement la note moyenne de la cible."
+          }
+        },
+        {
+          "name": "Avis reçus par un utilisateur",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/avis/user/USER_ID_DE_LA_CIBLE?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["avis", "user", "USER_ID_DE_LA_CIBLE"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            },
+            "description": "Récupère la liste paginée des avis laissés sur le profil de l'utilisateur."
+          }
+        }
+      ]
+    }
+  ]
+}
