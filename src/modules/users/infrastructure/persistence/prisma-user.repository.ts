@@ -88,4 +88,11 @@ export class PrismaUserRepository implements UserRepositoryInterface {
       data: { date_derniere_deconnexion: new Date() } as any,
     });
   }
+
+  async updateFcmToken(id: string, fcmToken: string): Promise<void> {
+    await this.prisma.user.update({
+      where: { id },
+      data: { fcm_token: fcmToken },
+    });
+  }
 }

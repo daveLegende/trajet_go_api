@@ -1,0 +1,282 @@
+{
+  "info": {
+    "_postman_id": "a1b2c3d4-e5f6-7890-1234-56789abcdef0",
+    "name": "TrajetGo API",
+    "description": "Collection Postman pour l'API TrajetGo. Renseignez la variable `jwtToken` avec votre access token JWT.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{jwtToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "jwtToken",
+      "value": "VOTRE_TOKEN_JWT_ICI",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Messagerie",
+      "item": [
+        {
+          "name": "1. Creer une conversation",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"participantIds\": [\"uuid-de-l-autre-utilisateur\"],\n  \"trajetId\": \"uuid-du-trajet-optionnel\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/conversations",
+              "host": ["{{baseUrl}}"],
+              "path": ["conversations"]
+            }
+          }
+        },
+        {
+          "name": "2. Lister mes conversations",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/conversations",
+              "host": ["{{baseUrl}}"],
+              "path": ["conversations"]
+            }
+          }
+        },
+        {
+          "name": "3. Historique d'une conversation",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/conversations/:id/messages",
+              "host": ["{{baseUrl}}"],
+              "path": ["conversations", ":id", "messages"],
+              "variable": [{ "key": "id", "value": "uuid-de-la-conversation" }]
+            }
+          }
+        },
+        {
+          "name": "4. Marquer les messages comme lus",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/conversations/:id/read",
+              "host": ["{{baseUrl}}"],
+              "path": ["conversations", ":id", "read"],
+              "variable": [{ "key": "id", "value": "uuid-de-la-conversation" }]
+            }
+          }
+        },
+        {
+          "name": "5. [WebSocket] Connexion + joinConversation + sendMessage",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "ws://localhost:3000/messagerie",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["messagerie"]
+            },
+            "description": "Connexion Socket.IO sur le namespace /messagerie.\n\nAuth : passer le token dans handshake.auth.token\n\nEvenements emettables :\n- joinConversation : { \"conversationId\": \"uuid\" }\n- sendMessage : { \"conversationId\": \"uuid\", \"contenu\": \"Hello !\" }\n\nEvenements ecoutables :\n- newMessage : recu quand un message est envoye dans la room\n- messageRead : (futur)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "1. Lister mes notifications",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications"]
+            }
+          }
+        },
+        {
+          "name": "2. Marquer une notification comme lue",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/notifications/:id/read",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications", ":id", "read"],
+              "variable": [{ "key": "id", "value": "uuid-de-la-notification" }]
+            }
+          }
+        },
+        {
+          "name": "3. Marquer toutes les notifications comme lues",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/notifications/read-all",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications", "read-all"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Mettre à jour le Token FCM",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fcmToken\": \"votre_token_fcm_genere_par_flutter\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/me/fcm-token",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "me", "fcm-token"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Signalements & SOS",
+      "item": [
+        {
+          "name": "Signaler un utilisateur",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cibleId\": \"uuid-utilisateur-signale\",\n  \"motif\": \"COMPORTEMENT_INAPPROPRIE\",\n  \"trajetId\": \"uuid-trajet-optionnel\",\n  \"description\": \"Il n'a pas respecté les règles de sécurité.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/signalements",
+              "host": ["{{baseUrl}}"],
+              "path": ["signalements"]
+            }
+          }
+        },
+        {
+          "name": "Déclencher Alerte SOS",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"trajetId\": \"uuid-trajet-en-cours\",\n  \"latitude\": 48.8566,\n  \"longitude\": 2.3522\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/sos",
+              "host": ["{{baseUrl}}"],
+              "path": ["sos"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Administration",
+      "item": [
+        {
+          "name": "Statistiques (Tableau de bord)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "stats"]
+            }
+          }
+        },
+        {
+          "name": "Bannir Utilisateur",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/:id/ban",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users", ":id", "ban"],
+              "variable": [{ "key": "id", "value": "uuid-utilisateur" }]
+            }
+          }
+        },
+        {
+          "name": "Débannir Utilisateur",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/:id/unban",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users", ":id", "unban"],
+              "variable": [{ "key": "id", "value": "uuid-utilisateur" }]
+            }
+          }
+        },
+        {
+          "name": "Résoudre Signalement",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"statut\": \"RESOLU\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/signalements/:id/resolve",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "signalements", ":id", "resolve"],
+              "variable": [{ "key": "id", "value": "uuid-signalement" }]
+            }
+          }
+        },
+        {
+          "name": "Résoudre SOS",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"statut\": \"RESOLUE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/sos/:id/resolve",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "sos", ":id", "resolve"],
+              "variable": [{ "key": "id", "value": "uuid-sos" }]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

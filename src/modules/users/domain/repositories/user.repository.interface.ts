@@ -24,4 +24,5 @@ export interface UserRepositoryInterface {
   update(id: string, data: Partial<UserEntity>): Promise<UserEntity>;
   updateLastLogin(id: string): Promise<void>;
   updateLastLogout(id: string): Promise<void>;
+  updateFcmToken(id: string, fcmToken: string): Promise<void>;
 }

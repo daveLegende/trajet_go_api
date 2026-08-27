@@ -42,6 +42,7 @@ describe('GetUserProfileUseCase', () => {
       update: jest.fn(),
       updateLastLogin: jest.fn(),
       updateLastLogout: jest.fn(),
+      updateFcmToken: jest.fn(),
     };
 
     useCase = new GetUserProfileUseCase(userRepository);

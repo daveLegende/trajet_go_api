@@ -6,7 +6,7 @@ import { TrajetRepositoryInterface } from '../../../trajets/domain/repositories/
 import { ReservationRepositoryInterface } from '../../../reservations/domain/repositories/reservation.repository.interface';
 import { AvisEntity } from '../../domain/entities/avis.entity';
 import { UserEntity } from '../../../users/domain/entities/user.entity';
-import { TrajetEntity, TypeReservation, StatutTrajet } from '../../../trajets/domain/entities/trajet.entity';
+import { TrajetEntity, TypeReservation, TrajetStatus } from '../../../trajets/domain/entities/trajet.entity';
 import { ReservationEntity, StatutReservation } from '../../../reservations/domain/entities/reservation.entity';
 
 describe('LaisserAvisUseCase', () => {
@@ -57,14 +57,15 @@ describe('LaisserAvisUseCase', () => {
       create: jest.fn(),
       updateLastLogin: jest.fn(),
       updateLastLogout: jest.fn(),
+      updateFcmToken: jest.fn(),
     };
 
     trajetRepository = {
       findById: jest.fn().mockResolvedValue(mockTrajet),
       create: jest.fn(),
       update: jest.fn(),
-      search: jest.fn(),
-      findByConducteurId: jest.fn(),
+      findMany: jest.fn(),
+      delete: jest.fn(),
     };
 
     reservationRepository = {

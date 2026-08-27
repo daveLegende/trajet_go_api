@@ -56,6 +56,7 @@ describe('RefreshTokenUseCase', () => {
       update: jest.fn(),
       updateLastLogin: jest.fn(),
       updateLastLogout: jest.fn(),
+      updateFcmToken: jest.fn(),
     } as any;
 
     refreshTokenRepository = {

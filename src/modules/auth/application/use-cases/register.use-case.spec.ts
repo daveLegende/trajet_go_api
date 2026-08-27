@@ -70,6 +70,7 @@ describe('RegisterUseCase', () => {
       update: jest.fn(),
       updateLastLogin: jest.fn(),
       updateLastLogout: jest.fn(),
+      updateFcmToken: jest.fn(),
     };
 
     refreshTokenRepository = {

@@ -15,6 +15,10 @@ import { VehiculesModule } from './modules/vehicules/vehicules.module';
 import { ReservationsModule } from './modules/reservations/reservations.module';
 import { PaiementsModule } from './modules/paiements/paiements.module';
 import { AvisModule } from './modules/avis/avis.module';
+import { MessagerieModule } from './modules/messagerie/messagerie.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
+import { SignalementsModule } from './modules/signalements/signalements.module';
+import { AdminModule } from './modules/admin/admin.module';
 
 @Module({
   imports: [
@@ -38,6 +42,10 @@ import { AvisModule } from './modules/avis/avis.module';
     ReservationsModule,
     PaiementsModule,
     AvisModule,
+    MessagerieModule,
+    NotificationsModule,
+    SignalementsModule,
+    AdminModule,
   ],
   providers: [
     {
